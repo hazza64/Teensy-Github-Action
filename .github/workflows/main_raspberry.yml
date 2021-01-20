@@ -33,12 +33,11 @@ jobs:
         - name: Install-Tennsyduino
           run: |  
                 wget --quiet https://www.pjrc.com/teensy/teensy_$PLATFORM_TEENSY.tar.gz
-                mkdir $HOME/teensy
-                tar xf teensy_$PLATFORM_TEENSY.tar.gz -C $HOME/teensy/
+                tar -xvzf teensy_$PLATFORM_TEENSY.tar.gz
                 /sbin/start-stop-daemon --start --quiet --pidfile /tmp/custom_xvfb_1.pid --make-pidfile --background --exec /usr/bin/Xvfb -- :1 -ac -screen 0 1280x1024x16
                 sleep 3
                 export DISPLAY=:1.0
-                ./$HOME/teensy/teensy --dir=$HOME/arduino_ide/arduino-$ARDUINO_IDE_VERSION
+                ./teensy --dir=$HOME/arduino_ide/arduino-$ARDUINO_IDE_VERSION
         - name: Check-present-working-Directory 
           run: |
                 pwd
