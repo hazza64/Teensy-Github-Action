@@ -19,33 +19,31 @@ jobs:
       DEVICE: "teensy40"
       SPEED: "600"
       USBTYPE: "serial"
+      PLATFORM_ARDUINO: "linuxarm"
+      PLATFORM_TEENSY: "raspberrypi"
     steps:
         - name: Check out repository 
           uses: actions/checkout@v1
 
         - name: Install-Arduino
           run: |
-              wget --quiet https://downloads.arduino.cc/arduino-$ARDUINO_IDE_VERSION-linux64.tar.xz
+              wget --quiet https://downloads.arduino.cc/arduino-$ARDUINO_IDE_VERSION-$PLATFORM_ARDUINO.tar.xz
               mkdir $HOME/arduino_ide
-              tar xf arduino-$ARDUINO_IDE_VERSION-linux64.tar.xz -C $HOME/arduino_ide/
+              tar xf arduino-$ARDUINO_IDE_VERSION-$PLATFORM_ARDUINO.tar.xz -C $HOME/arduino_ide/
         - name: Install-Tennsyduino
           run: |  
-                curl -fsSL https://www.pjrc.com/teensy/td_153/TeensyduinoInstall.linux64 -o TeensyduinoInstall.linux64
-                chmod +x TeensyduinoInstall.linux64
+                curl -fsSL https://www.pjrc.com/teensy/td_153/TeensyduinoInstall.$PLATFORM_TEENSY -o TeensyduinoInstall.$PLATFORM_TEENSY
+                chmod +x TeensyduinoInstall.$PLATFORM_TEENSY
                 /sbin/start-stop-daemon --start --quiet --pidfile /tmp/custom_xvfb_1.pid --make-pidfile --background --exec /usr/bin/Xvfb -- :1 -ac -screen 0 1280x1024x16
                 sleep 3
                 export DISPLAY=:1.0
-                ./TeensyduinoInstall.linux64 --dir=$HOME/arduino_ide/arduino-$ARDUINO_IDE_VERSION
+                ./TeensyduinoInstall.$PLATFORM_TEENSY --dir=$HOME/arduino_ide/arduino-$ARDUINO_IDE_VERSION
         - name: Check-present-working-Directory 
           run: |
                 pwd
                 ls -r
                 cd ..
                 ls
-        - name: Install Additional Libraries
-          run: |
-                cd $HOME/arduino_ide/arduino-$ARDUINO_IDE_VERSION/
-                ./arduino --install-library "base64"
         - name: Verify-Code 
           run: bash build-sketches.sh
         
