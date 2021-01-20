@@ -33,9 +33,6 @@ jobs:
           run: |  
                 curl -fsSL https://www.pjrc.com/teensy/td_153/TeensyduinoInstall.$PLATFORM -o TeensyduinoInstall.$PLATFORM
                 chmod +x TeensyduinoInstall.$PLATFORM
-                /sbin/start-stop-daemon --start --quiet --pidfile /tmp/custom_xvfb_1.pid --make-pidfile --background --exec /usr/bin/Xvfb -- :1 -ac -screen 0 1280x1024x16
-                sleep 3
-                export DISPLAY=:1.0
                 ./TeensyduinoInstall.$PLATFORM --dir=$HOME/arduino_ide/arduino-$ARDUINO_IDE_VERSION
         - name: Check-present-working-Directory 
           run: |
