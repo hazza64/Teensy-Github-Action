@@ -1,0 +1,56 @@
+# This is a basic workflow to help you get started with Actions
+
+name: Build
+
+# Controls when the action will run. Triggers the workflow on push or pull request
+# events but only for the master branch
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  runMultipleCommands:
+    runs-on: ubuntu-latest
+    env: 
+      ARDUINO_IDE_VERSION: "1.8.13"
+      DEVICE: "teensy40"
+      SPEED: "600"
+      USBTYPE: "serial"
+      PLATFORM_ARDUINO: "linuxarm"
+      PLATFORM_TEENSY: "raspberrypi"
+    steps:
+        - name: Check out repository 
+          uses: actions/checkout@v1
+
+        - name: Install-Arduino
+          run: |
+              wget --quiet https://downloads.arduino.cc/arduino-$ARDUINO_IDE_VERSION-$PLATFORM_ARDUINO.tar.xz
+              mkdir $HOME/arduino_ide
+              tar xf arduino-$ARDUINO_IDE_VERSION-$PLATFORM_ARDUINO.tar.xz -C $HOME/arduino_ide/
+        - name: Install-Tennsyduino
+          run: |  
+                curl -fsSL https://www.pjrc.com/teensy/td_153/TeensyduinoInstall.$PLATFORM_TEENSY -o TeensyduinoInstall.$PLATFORM_TEENSY
+                chmod +x TeensyduinoInstall.$PLATFORM_TEENSY
+                /sbin/start-stop-daemon --start --quiet --pidfile /tmp/custom_xvfb_1.pid --make-pidfile --background --exec /usr/bin/Xvfb -- :1 -ac -screen 0 1280x1024x16
+                sleep 3
+                export DISPLAY=:1.0
+                ./TeensyduinoInstall.$PLATFORM_TEENSY --dir=$HOME/arduino_ide/arduino-$ARDUINO_IDE_VERSION
+        - name: Check-present-working-Directory 
+          run: |
+                pwd
+                ls -r
+                cd ..
+                ls
+        - name: Verify-Code 
+          run: bash build-sketches.sh
+        
+        - name: upload-Code 
+          uses: actions/upload-artifact@v2
+          with:
+            name: my-artifact
+            path: error.txt
+        - name: Check-Status 
+          run: python3 check-status.py
