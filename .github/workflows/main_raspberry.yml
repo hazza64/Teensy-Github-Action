@@ -20,7 +20,7 @@ jobs:
       SPEED: "600"
       USBTYPE: "serial"
       PLATFORM_ARDUINO: "linuxarm"
-      PLATFORM_TEENSY: "raspberrypi"
+      PLATFORM_TEENSY: "linuxarm"
     steps:
         - name: Check out repository 
           uses: actions/checkout@v1
@@ -32,12 +32,12 @@ jobs:
               tar xf arduino-$ARDUINO_IDE_VERSION-$PLATFORM_ARDUINO.tar.xz -C $HOME/arduino_ide/
         - name: Install-Tennsyduino
           run: |  
-                wget --quiet https://www.pjrc.com/teensy/teensy_$PLATFORM_TEENSY.tar.gz
-                tar -xvzf teensy_$PLATFORM_TEENSY.tar.gz
+                curl -fsSL https://www.pjrc.com/teensy/td_153/TeensyduinoInstall.$PLATFORM_TEENSY -o TeensyduinoInstall.$PLATFORM_TEENSY
+                chmod +x TeensyduinoInstall.$PLATFORM_TEENSY
                 /sbin/start-stop-daemon --start --quiet --pidfile /tmp/custom_xvfb_1.pid --make-pidfile --background --exec /usr/bin/Xvfb -- :1 -ac -screen 0 1280x1024x16
                 sleep 3
                 export DISPLAY=:1.0
-                ./teensy --dir=$HOME/arduino_ide/arduino-$ARDUINO_IDE_VERSION
+                ./TeensyduinoInstall.$PLATFORM_TEENSY --dir=$HOME/arduino_ide/arduino-$ARDUINO_IDE_VERSION
         - name: Check-present-working-Directory 
           run: |
                 pwd
